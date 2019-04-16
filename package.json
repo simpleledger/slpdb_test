@@ -4,13 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha --reporter mochawesome"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "axios": "^0.18.0",
     "btoa": "^1.2.1",
-    "mocha": "^6.1.3"
+    "mocha": "^6.1.3",
+    "mochawesome": "^3.1.1"
   }
 }
