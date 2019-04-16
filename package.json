@@ -1,0 +1,16 @@
+{
+  "name": "slpdb_test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "btoa": "^1.2.1",
+    "mocha": "^6.1.3"
+  }
+}
