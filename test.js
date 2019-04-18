@@ -10,6 +10,11 @@ const btoa = require('btoa')
 const axios = require('axios')
 const _ = require('lodash')
 
+const regex = {
+  TOKENIDHEX: '[0-9a-f]{64}',
+  UTXO: '[0-9a-f]{64}:[0-9]+'
+}
+
 const slpdb = {
   query: (query) => new Promise((resolve, reject) => {
     if (!query) {
@@ -138,8 +143,7 @@ describe('tokens', () => {
           ],
           'limit': 1
         }
-      })
-      .then((data) => assert.strict.equal(0, data.t.length))
+      }).then((data) => assert.strict.equal(0, data.t.length))
     )
   })
 
@@ -152,7 +156,7 @@ describe('tokens', () => {
     })
     describe('#tokenDetails.tokenIdHex correct format', () => {
       it('tokenIdHex must exist and must be hex string of 64 length', () =>
-        slpdb.query(slpdb.inverse_match_regex('tokenDetails.tokenIdHex', 't', '[0-9a-f]{64}'))
+        slpdb.query(slpdb.inverse_match_regex('tokenDetails.tokenIdHex', 't', regex.TOKENIDHEX))
           .then((data) => assert.strict.equal(0, data.t.length))
       )
     })
@@ -224,6 +228,17 @@ describe('confirmed', () => {
         .then((data) => assert.strict.equal(0, data.c.length))
     )
   }))
+
+  describe('confirmed.slp', () => {
+    describe('confirmed.slp.details', () => {
+      describe('#tokenIdHex correct format', () => {
+        it('tokenIdHex must exist and must be hex string of 64 length', () =>
+          slpdb.query(slpdb.inverse_match_regex('slp.details.tokenIdHex', 'g', regex.TOKENIDHEX))
+            .then((data) => assert.strict.equal(0, data.g.length))
+        )
+      })
+    })
+  })
 })
 
 describe('graphs', () => {
@@ -262,6 +277,16 @@ describe('graphs', () => {
         .then((data) => assert.strict.equal(0, data.g.length))
     )
   }))
+  describe('graphs.graphTxn', () => {
+    describe('graphs.graphTxn.details', () => {
+      describe('#tokenIdHex correct format', () =>
+        it('tokenIdHex must exist and must be hex string of 64 length', () =>
+          slpdb.query(slpdb.inverse_match_regex('graphTxn.details.tokenIdHex', 'g', regex.TOKENIDHEX))
+            .then((data) => assert.strict.equal(0, data.g.length))
+        )
+      )
+    })
+  })
 })
 
 describe('addresses', () => {
@@ -277,6 +302,14 @@ describe('addresses', () => {
         .then((data) => assert.strict.equal(0, data.a.length))
     )
   }))
+  describe('addresses.tokenDetails', () => {
+    describe('#tokenIdHex correct format', () =>
+      it('tokenIdHex must exist and must be hex string of 64 length', () =>
+        slpdb.query(slpdb.inverse_match_regex('tokenDetails.tokenIdHex', 'a', regex.TOKENIDHEX))
+          .then((data) => assert.strict.equal(0, data.a.length))
+      )
+    )
+  })
 })
 
 describe('utxos', () => {
@@ -291,14 +324,16 @@ describe('utxos', () => {
     )
   }))
   describe('utxos.tokenDetails', () => {
-    describe('utxos.tokenDetails.tokenIdHex', () =>
-      slpdb.query(slpdb.inverse_match_regex('tokenDetails.tokenIdHex', 'x', '[0-9a-f]{64}'))
-        .then((data) => assert.strict.equal(0, data.x.length))
+    describe('#tokenIdHex correct format', () =>
+      it('tokenIdHex must exist and must be hex string of 64 length', () =>
+        slpdb.query(slpdb.inverse_match_regex('tokenDetails.tokenIdHex', 'x', regex.TOKENIDHEX))
+          .then((data) => assert.strict.equal(0, data.x.length))
+      )
     )
   })
   describe('#utxos.utxo correct format', () => {
     it('utxo must follow the regex provided for txid:vout', () =>
-      slpdb.query(slpdb.inverse_match_regex('utxo', 'x', '[0-9a-f]{64}:[0-9]+'))
+      slpdb.query(slpdb.inverse_match_regex('utxo', 'x', regex.UTXO))
         .then((data) => assert.strict.equal(0, data.x.length))
     )
   })
