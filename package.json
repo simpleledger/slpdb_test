@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha --reporter mochawesome",
-    "lint": "standard"
+    "lint": "standard && echo \"Passed lint guidelines\""
   },
   "author": "",
   "license": "ISC",
