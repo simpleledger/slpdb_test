@@ -1,3 +1,10 @@
+(() => {
+  const configResult = require('dotenv').config()
+  if (configResult.error) {
+    throw configResult.error
+  }
+})()
+
 const assert = require('assert')
 const btoa = require('btoa')
 const axios = require('axios')
@@ -9,7 +16,7 @@ const slpdb = {
       return reject(new Error('no query provided'))
     }
     const b64 = btoa(JSON.stringify(query))
-    const url = 'https://slpdb.fountainhead.cash/q/' + b64
+    const url = process.env.SLPSERVE_URL + b64
 
     resolve(axios.get(url)
       .then(data => data.data,
