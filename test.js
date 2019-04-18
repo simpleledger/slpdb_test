@@ -310,6 +310,22 @@ describe('addresses', () => {
       )
     )
   })
+  describe('#satoshis_balance correct format', () =>
+    it('satoshis_balance must be a positive integer', () =>
+      slpdb.query({
+        'v': 3,
+        'q': {
+          'db': 'a',
+          'find': {
+            'satoshis_balance': {
+              '$lt': 546
+            }
+          },
+          'limit': 1
+        }
+      }).then((data) => assert.strict.equal(0, data.a.length))
+    )
+  )
 })
 
 describe('utxos', () => {
