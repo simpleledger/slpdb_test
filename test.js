@@ -1,22 +1,81 @@
 const assert = require('assert');
-const btoa = require('btoa');
-const axios = require('axios');
+const btoa   = require('btoa');
+const axios  = require('axios');
+const _      = require('lodash');
 
 
 const slpdb = {
   query: (query) => new Promise((resolve, reject) => {
     if (! query) {
-      return resolve(false);
+      return reject(false);
     }
     const b64 = btoa(JSON.stringify(query));
     const url = "https://slpdb.fountainhead.cash/q/" + b64;
   
-    console.log(url)
-    resolve(axios.get(url).then(data => data.data));
+    resolve(axios.get(url)
+     .then(data => data.data),
+           e => reject(e)
+    );
   }),
-}
+
+  // helper query to check the property exists
+  exists: (prop, db, additional_requirements={}) => {
+    let find = {
+      [prop]: {
+        "$exists": false
+      }
+    };
+    _.merge(find, additional_requirements);
+
+    return {
+      "v": 3,
+      "q": {
+        "db": [db],
+        "find": find,
+        "limit": 1
+      }
+    };
+  },
+};
 
 describe('tokens', () => {
+  [
+    "schema_version",
+    "lastUpdatedBlock",
+    "mintBatonUtxo",
+    "tokenDetails",
+    "tokenDetails.decimals",
+    "tokenDetails.tokenIdHex",
+    "tokenDetails.timestamp",
+    "tokenDetails.transactionType",
+    "tokenDetails.versionType",
+    "tokenDetails.documentUri",
+    "tokenDetails.documentSha256Hex",
+    "tokenDetails.symbol",
+    "tokenDetails.name",
+    "tokenDetails.batonVout",
+    "tokenDetails.containsBaton",
+    "tokenDetails.genesisOrMintQuantity",
+    "tokenDetails.sendOutputs",
+    "tokenStats",
+    "tokenStats.block_created",
+    "tokenStats.block_last_active_send",
+    "tokenStats.block_last_active_mint",
+    "tokenStats.qty_valid_txns_since_genesis",
+    "tokenStats.qty_valid_token_utxos",
+    "tokenStats.qty_valid_token_addresses",
+    "tokenStats.qty_token_minted",
+    "tokenStats.qty_token_burned",
+    "tokenStats.qty_token_circulating_supply",
+    "tokenStats.qty_satoshis_locked_up",
+    "tokenStats.minting_baton_status",
+  ].forEach(key => describe(`#${key} exists`, () => {
+    it(`there should be no token documents without a ${key} property`, () =>
+      slpdb.query(slpdb.exists(key, 't'))
+      .then((data) => assert.equal(0, data.t.length))
+    )
+  }));
+
   describe('#mintBatonUtxo correct format', () => {
     it('mintBatonUtxo must be either empty string or follow the regex provided for txid:vout', () =>
       Promise.all([
@@ -65,22 +124,6 @@ describe('tokens', () => {
   });
 
   describe('tokens.tokenDetails', () => {
-    describe('#tokenDetails exists', () => {
-      it('there should be no token documents without a tokenDetails property', () =>
-        slpdb.query({
-          "v": 3,
-          "q": {
-            "db": ["t"],
-            "find": {
-              "tokenDetails": {
-                "$exists": false
-              }
-            },
-            "limit": 10
-          }
-        }).then((data) => assert.equal(0, data.t.length))
-      )
-    });
     describe('#tokenDetails.decimals correct format', () => {
       it('decimals must be 0-9', () =>
         slpdb.query({
@@ -171,25 +214,144 @@ describe('tokens', () => {
         }).then((data) => assert.equal(0, data.t.length))
         )
     })
-  })
-
-  describe('tokens.tokenStats', () => {
-    describe('#tokenStats exists', () => {
-      it('there should be no token documents without a tokenStats property', () =>
+    describe('#tokenDetails.versionType correct format', () => {
+      it('versionType must be 1', () =>
         slpdb.query({
           "v": 3,
           "q": {
             "db": ["t"],
             "find": {
-              "tokenStats": {
-                "$exists": false
+              "tokenDetails.versionType": {
+                "$nin": [1]
               }
             },
-            "limit": 10
+            "limit": 1
           }
         }).then((data) => assert.equal(0, data.t.length))
-      )
-    });
-  });
+        )
+    })
+  })
 });
 
+
+describe('confirmed', () => {
+  [
+    "tx",
+    "tx.h",
+    "in",
+    "in.i",
+    "in.str",
+    "in.e",
+    "in.e.h",
+    "in.e.i",
+    "in.e.a",
+    "out",
+    "out.i",
+    "out.str",
+    "out.e",
+    "out.e.v",
+    "out.e.i",
+    "slp",
+    "slp.valid",
+    "blk",
+    "blk.h",
+    "blk.i",
+    "blk.t",
+  ].forEach(key => describe(`#${key} exists`, () => {
+    it(`there should be no confirmed documents without a ${key} property`, () =>
+      slpdb.query(slpdb.exists(key, 'c'))
+      .then((data) => assert.equal(0, data.c.length))
+    )
+  }));
+
+  [
+    "slp.detail",
+    "slp.detail.decimals",
+    "slp.detail.tokenIdHex",
+    "slp.detail.transactionType",
+    "slp.detail.versionType",
+    "slp.detail.documentUri",
+    "slp.detail.documentSha256Hex",
+    "slp.detail.symbol",
+    "slp.detail.name",
+    "slp.detail.txnBatonVout",
+    "slp.detail.txnContainsBaton",
+    "slp.detail.outputs",
+    "slp.detail.outputs.address",
+    "slp.detail.outputs.amount",
+    "slp.invalidReason",
+    "slp.schema_version",
+  ].forEach(key => describe(`#${key} exists`, () => {
+    it(`there should be no confirmed documents without a ${key} property`, () =>
+      slpdb.query(slpdb.exists(key, 'c', {'slp.valid': true}))
+      .then((data) => assert.equal(0, data.c.length))
+    )
+  }));
+});
+
+
+describe('graphs', () => {
+  [
+    "tokenDetails",
+    "tokenDetails.tokenIdHex",
+    "graphTxn",
+    "graphTxn.txid",
+    "graphTxn.timestamp",
+    "graphTxn.block",
+    "graphTxn.details",
+    "graphTxn.details.decimals",
+    "graphTxn.details.tokenIdHex",
+    "graphTxn.details.timestamp",
+    "graphTxn.details.transactionType",
+    "graphTxn.details.versionType",
+    "graphTxn.details.documentUri",
+    "graphTxn.details.documentSha256Hex",
+    "graphTxn.details.symbol",
+    "graphTxn.details.name",
+    "graphTxn.details.batonVout",
+    "graphTxn.details.containsBaton",
+    "graphTxn.details.genesisOrMintQuantity",
+    "graphTxn.details.sendOutputs",
+    "graphTxn.outputs",
+    "graphTxn.outputs.slpAmount",
+    "graphTxn.outputs.address",
+    "graphTxn.outputs.vout",
+    "graphTxn.outputs.bchSatoshis",
+    "graphTxn.outputs.spendTxid",
+    "graphTxn.outputs.status",
+    "graphTxn.outputs.invalidReason",
+  ].forEach(key => describe(`#${key} exists`, () => {
+    it(`there should be no graph documents without a ${key} property`, () =>
+      slpdb.query(slpdb.exists(key, 'g'))
+      .then((data) => assert.equal(0, data.g.length))
+    )
+  }));
+});
+
+describe('addresses', () => {
+  [
+    "tokenDetails",
+    "tokenDetails.tokenIdHex",
+    "address",
+    "satoshis_balance",
+    "token_balance",
+  ].forEach(key => describe(`#${key} exists`, () => {
+    it(`there should be no address documents without a ${key} property`, () =>
+      slpdb.query(slpdb.exists(key, 'a'))
+      .then((data) => assert.equal(0, data.a.length))
+    )
+  }));
+});
+
+describe('utxos', () => {
+  [
+    "tokenDetails",
+    "tokenDetails.tokenIdHex",
+    "utxo",
+  ].forEach(key => describe(`#${key} exists`, () => {
+    it(`there should be no utxo documents without a ${key} property`, () =>
+      slpdb.query(slpdb.exists(key, 'x'))
+      .then((data) => assert.equal(0, data.x.length))
+    )
+  }));
+});
