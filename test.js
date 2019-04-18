@@ -113,48 +113,33 @@ describe('tokens', () => {
 
   describe('#mintBatonUtxo correct format', () => {
     it('mintBatonUtxo must be either empty string or follow the regex provided for txid:vout', () =>
-      Promise.all([
-        slpdb.query({
-          'v': 3,
-          'q': {
-            'db': ['t'],
-            'aggregate': [
-              {
-                '$count': 'mintBatonUtxo'
-              }
-            ],
-            'limit': 1
-          }
-        }),
-        slpdb.query({
-          'v': 3,
-          'q': {
-            'db': ['t'],
-            'aggregate': [
-              {
-                '$match': {
-                  '$or': [
-                    {
-                      'mintBatonUtxo': {
-                        '$eq': ''
-                      }
-                    },
-                    {
-                      'mintBatonUtxo': {
-                        '$regex': '^[0-9a-f]{64}:[0-9]+$'
-                      }
-                    }
-                  ]
+      slpdb.query({
+        'v': 3,
+        'q': {
+          'db': ['t'],
+          'aggregate': [
+            {
+              '$match': {
+                'mintBatonUtxo': {
+                  '$ne': ''
                 }
-              },
-              {
-                '$count': 'mintBatonUtxo'
               }
-            ],
-            'limit': 1
-          }
-        })
-      ]).then(([total, mintBatonMatched]) => assert.strict.equal(total.t.mintBatonUtxo, mintBatonMatched.t.mintBatonUtxo))
+            },
+            {
+              '$match': {
+                'mintBatonUtxo': {
+                  '$regex': `^((?![0-9a-f]{64}:[0-9]+).)*$`
+                }
+              }
+            },
+            {
+              '$count': 'mintBatonUtxo'
+            }
+          ],
+          'limit': 1
+        }
+      })
+      .then((data) => assert.strict.equal(0, data.t.length))
     )
   })
 
