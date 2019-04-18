@@ -12,6 +12,7 @@ const _ = require('lodash')
 
 const regex = {
   TOKENIDHEX: '[0-9a-f]{64}',
+  TXID: '[0-9a-f]{64}',
   UTXO: '[0-9a-f]{64}:[0-9]+'
 }
 
@@ -278,6 +279,12 @@ describe('graphs', () => {
     )
   }))
   describe('graphs.graphTxn', () => {
+    describe('#txid correct format', () =>
+      it('txid must exist and must be hex string of 64 length', () =>
+        slpdb.query(slpdb.inverse_match_regex('graphTxn.txid', 'g', regex.TXID))
+          .then((data) => assert.strict.equal(0, data.g.length))
+      )
+    )
     describe('graphs.graphTxn.details', () => {
       describe('#tokenIdHex correct format', () =>
         it('tokenIdHex must exist and must be hex string of 64 length', () =>
