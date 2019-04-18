@@ -71,7 +71,7 @@ describe('tokens', () => {
   ].forEach(key => describe(`#${key} exists`, () => {
     it(`there should be no token documents without a ${key} property`, () =>
       slpdb.query(slpdb.exists(key, 't'))
-        .then((data) => assert.equal(0, data.t.length))
+        .then((data) => assert.strict.equal(0, data.t.length))
     )
   }))
 
@@ -118,7 +118,7 @@ describe('tokens', () => {
             'limit': 1
           }
         })
-      ]).then(([total, mint_baton_matched]) => assert.equal(total.t.mintBatonUtxo, mint_baton_matched.t.mintBatonUtxo))
+      ]).then(([total, mintBatonMatched]) => assert.strict.equal(total.t.mintBatonUtxo, mintBatonMatched.t.mintBatonUtxo))
     )
   })
 
@@ -159,7 +159,7 @@ describe('tokens', () => {
             ],
             'limit': 1
           }
-        }).then(data => assert.equal(0, data.t.length))
+        }).then(data => assert.strict.equal(0, data.t.length))
       )
     })
     describe('#tokenDetails.tokenIdHex correct format', () => {
@@ -194,7 +194,7 @@ describe('tokens', () => {
               'limit': 1
             }
           })
-        ]).then(([total, tokenidhex_matched]) => assert.equal(total.t.mintBatonUtxo, tokenidhex_matched.t.mintBatonUtxo))
+        ]).then(([total, tokenIdHexMatched]) => assert.strict.equal(total.t.mintBatonUtxo, tokenIdHexMatched.t.mintBatonUtxo))
       )
     })
     describe('#tokenDetails.transactionType correct format', () => {
@@ -210,7 +210,7 @@ describe('tokens', () => {
             },
             'limit': 1
           }
-        }).then((data) => assert.equal(0, data.t.length))
+        }).then((data) => assert.strict.equal(0, data.t.length))
       )
     })
     describe('#tokenDetails.versionType correct format', () => {
@@ -226,7 +226,7 @@ describe('tokens', () => {
             },
             'limit': 1
           }
-        }).then((data) => assert.equal(0, data.t.length))
+        }).then((data) => assert.strict.equal(0, data.t.length))
       )
     })
   })
@@ -258,7 +258,7 @@ describe('confirmed', () => {
   ].forEach(key => describe(`#${key} exists`, () => {
     it(`there should be no confirmed documents without a ${key} property`, () =>
       slpdb.query(slpdb.exists(key, 'c'))
-        .then((data) => assert.equal(0, data.c.length))
+        .then((data) => assert.strict.equal(0, data.c.length))
     )
   }));
 
@@ -282,7 +282,7 @@ describe('confirmed', () => {
   ].forEach(key => describe(`#${key} exists`, () => {
     it(`there should be no confirmed documents without a ${key} property`, () =>
       slpdb.query(slpdb.exists(key, 'c', { 'slp.valid': true }))
-        .then((data) => assert.equal(0, data.c.length))
+        .then((data) => assert.strict.equal(0, data.c.length))
     )
   }))
 })
@@ -320,7 +320,7 @@ describe('graphs', () => {
   ].forEach(key => describe(`#${key} exists`, () => {
     it(`there should be no graph documents without a ${key} property`, () =>
       slpdb.query(slpdb.exists(key, 'g'))
-        .then((data) => assert.equal(0, data.g.length))
+        .then((data) => assert.strict.equal(0, data.g.length))
     )
   }))
 })
@@ -335,7 +335,7 @@ describe('addresses', () => {
   ].forEach(key => describe(`#${key} exists`, () => {
     it(`there should be no address documents without a ${key} property`, () =>
       slpdb.query(slpdb.exists(key, 'a'))
-        .then((data) => assert.equal(0, data.a.length))
+        .then((data) => assert.strict.equal(0, data.a.length))
     )
   }))
 })
@@ -348,7 +348,7 @@ describe('utxos', () => {
   ].forEach(key => describe(`#${key} exists`, () => {
     it(`there should be no utxo documents without a ${key} property`, () =>
       slpdb.query(slpdb.exists(key, 'x'))
-        .then((data) => assert.equal(0, data.x.length))
+        .then((data) => assert.strict.equal(0, data.x.length))
     )
   }))
 })
