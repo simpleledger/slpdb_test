@@ -18,6 +18,9 @@ const slpdb = {
     const b64 = btoa(JSON.stringify(query))
     const url = process.env.SLPSERVE_URL + b64
 
+    // log to help debugging
+    console.info(url)
+
     resolve(axios.get(url)
       .then(data => data.data,
         e => reject(e))
