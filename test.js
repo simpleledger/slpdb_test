@@ -161,41 +161,8 @@ describe('tokens', () => {
   describe('tokens.tokenDetails', () => {
     describe('#tokenDetails.decimals correct format', () => {
       it('decimals must be 0-9', () =>
-        slpdb.query({
-          'v': 3,
-          'q': {
-            'db': ['t'],
-            'aggregate': [
-              {
-                '$match': {
-                  '$or': [
-                    {
-                      'tokenDetails.decimals': {
-                        '$gt': 9
-                      }
-                    },
-                    {
-                      'tokenDetails.decimals': {
-                        '$lt': 0
-                      }
-                    },
-                    {
-                      'tokenDetails.decimals': {
-                        '$not': {
-                          '$type': 'number'
-                        }
-                      }
-                    }
-                  ]
-                }
-              },
-              {
-                '$count': 'mintBatonUtxo'
-              }
-            ],
-            'limit': 1
-          }
-        }).then(data => assert.strict.equal(0, data.t.length))
+        slpdb.query(slpdb.inverse_match_array('tokenDetails.decimals', 't', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]))
+          .then(data => assert.strict.equal(0, data.t.length))
       )
     })
     describe('#tokenDetails.tokenIdHex correct format', () => {
