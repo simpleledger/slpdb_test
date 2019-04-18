@@ -361,4 +361,20 @@ describe('utxos', () => {
         .then((data) => assert.strict.equal(0, data.x.length))
     )
   }))
+  describe('#utxos.utxo correct format', () => {
+    it('utxo must follow the regex provided for txid:vout', () =>
+      slpdb.query({
+        "v": 3,
+        "q": {
+          "db": ["x"],
+          "find": {
+            "utxo": {
+              "$regex": "^((?![0-9a-f]{64}:[0-9]+).)*$"
+            }
+          },
+          "limit": 1
+        }
+      }).then((data) => assert.strict.equal(0, data.x.length))
+    )
+  })
 })
