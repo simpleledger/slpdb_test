@@ -187,53 +187,14 @@ describe('tokens', () => {
     })
     describe('#tokenDetails.tokenIdHex correct format', () => {
       it('tokenIdHex must exist and must be hex string of 64 length', () =>
-        Promise.all([
-          slpdb.query({
-            'v': 3,
-            'q': {
-              'aggregate': [
-                {
-                  '$count': 'mintBatonUtxo'
-                }
-              ],
-              'limit': 1
-            }
-          }),
-          slpdb.query({
-            'v': 3,
-            'q': {
-              'aggregate': [
-                {
-                  '$match': {
-                    'tokenDetails.tokenIdHex': {
-                      '$regex': '^[0-9a-f]{64}$'
-                    }
-                  }
-                },
-                {
-                  '$count': 'mintBatonUtxo'
-                }
-              ],
-              'limit': 1
-            }
-          })
-        ]).then(([total, tokenIdHexMatched]) => assert.strict.equal(total.t.mintBatonUtxo, tokenIdHexMatched.t.mintBatonUtxo))
+        slpdb.query(slpdb.inverse_match('tokenDetails.tokenIdHex', 't', '[0-9a-f]{64}'))
+          .then((data) => assert.strict.equal(0, data.t.length))
       )
     })
     describe('#tokenDetails.transactionType correct format', () => {
       it('transactionType must be GENESIS', () =>
-        slpdb.query({
-          'v': 3,
-          'q': {
-            'db': ['t'],
-            'find': {
-              'tokenDetails.transactionType': {
-                '$nin': ['GENESIS']
-              }
-            },
-            'limit': 1
-          }
-        }).then((data) => assert.strict.equal(0, data.t.length))
+        slpdb.query(slpdb.inverse_match('tokenDetails.transactionType', 't', 'GENESIS'))
+          .then((data) => assert.strict.equal(0, data.t.length))
       )
     })
     describe('#tokenDetails.versionType correct format', () => {
