@@ -46,13 +46,26 @@ const slpdb = {
     }
   },
 
-  inverse_match: (prop, db, regex) => ({
+  inverse_match_regex: (prop, db, regex) => ({
     'v': 3,
     'q': {
       'db': [db],
       'find': {
         [prop]: {
           '$regex': `^((?!${regex}).)*$`
+        }
+      },
+      'limit': 1
+    }
+  }),
+
+  inverse_match_array: (prop, db, arr) => ({
+    'v': 3,
+    'q': {
+      'db': [db],
+      'find': {
+        [prop]: {
+          '$nin': arr
         }
       },
       'limit': 1
@@ -187,30 +200,20 @@ describe('tokens', () => {
     })
     describe('#tokenDetails.tokenIdHex correct format', () => {
       it('tokenIdHex must exist and must be hex string of 64 length', () =>
-        slpdb.query(slpdb.inverse_match('tokenDetails.tokenIdHex', 't', '[0-9a-f]{64}'))
+        slpdb.query(slpdb.inverse_match_regex('tokenDetails.tokenIdHex', 't', '[0-9a-f]{64}'))
           .then((data) => assert.strict.equal(0, data.t.length))
       )
     })
     describe('#tokenDetails.transactionType correct format', () => {
       it('transactionType must be GENESIS', () =>
-        slpdb.query(slpdb.inverse_match('tokenDetails.transactionType', 't', 'GENESIS'))
+        slpdb.query(slpdb.inverse_match_regex('tokenDetails.transactionType', 't', 'GENESIS'))
           .then((data) => assert.strict.equal(0, data.t.length))
       )
     })
     describe('#tokenDetails.versionType correct format', () => {
       it('versionType must be 1', () =>
-        slpdb.query({
-          'v': 3,
-          'q': {
-            'db': ['t'],
-            'find': {
-              'tokenDetails.versionType': {
-                '$nin': [1]
-              }
-            },
-            'limit': 1
-          }
-        }).then((data) => assert.strict.equal(0, data.t.length))
+        slpdb.query(slpdb.inverse_match_array('tokenDetails.versionType', 't', [1]))
+          .then((data) => assert.strict.equal(0, data.t.length))
       )
     })
   })
@@ -337,13 +340,13 @@ describe('utxos', () => {
   }))
   describe('utxos.tokenDetails', () => {
     describe('utxos.tokenDetails.tokenIdHex', () =>
-      slpdb.query(slpdb.inverse_match('tokenDetails.tokenIdHex', 'x', '[0-9a-f]{64}'))
+      slpdb.query(slpdb.inverse_match_regex('tokenDetails.tokenIdHex', 'x', '[0-9a-f]{64}'))
         .then((data) => assert.strict.equal(0, data.x.length))
     )
   })
   describe('#utxos.utxo correct format', () => {
     it('utxo must follow the regex provided for txid:vout', () =>
-      slpdb.query(slpdb.inverse_match('utxo', 'x', '[0-9a-f]{64}:[0-9]+'))
+      slpdb.query(slpdb.inverse_match_regex('utxo', 'x', '[0-9a-f]{64}:[0-9]+'))
         .then((data) => assert.strict.equal(0, data.x.length))
     )
   })
