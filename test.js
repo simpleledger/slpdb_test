@@ -44,7 +44,20 @@ const slpdb = {
         'limit': 1
       }
     }
-  }
+  },
+
+  inverse_match: (prop, db, regex) => ({
+    'v': 3,
+    'q': {
+      'db': [db],
+      'find': {
+        [prop]: {
+          '$regex': `^((?!${regex}).)*$`
+        }
+      },
+      'limit': 1
+    }
+  })
 }
 
 describe('tokens', () => {
@@ -361,20 +374,16 @@ describe('utxos', () => {
         .then((data) => assert.strict.equal(0, data.x.length))
     )
   }))
+  describe('utxos.tokenDetails', () => {
+    describe('utxos.tokenDetails.tokenIdHex', () =>
+      slpdb.query(slpdb.inverse_match('tokenDetails.tokenIdHex', 'x', '[0-9a-f]{64}'))
+        .then((data) => assert.strict.equal(0, data.x.length))
+    )
+  })
   describe('#utxos.utxo correct format', () => {
     it('utxo must follow the regex provided for txid:vout', () =>
-      slpdb.query({
-        "v": 3,
-        "q": {
-          "db": ["x"],
-          "find": {
-            "utxo": {
-              "$regex": "^((?![0-9a-f]{64}:[0-9]+).)*$"
-            }
-          },
-          "limit": 1
-        }
-      }).then((data) => assert.strict.equal(0, data.x.length))
+      slpdb.query(slpdb.inverse_match('utxo', 'x', '[0-9a-f]{64}:[0-9]+'))
+        .then((data) => assert.strict.equal(0, data.x.length))
     )
   })
 })
