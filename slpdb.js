@@ -10,6 +10,11 @@ const axios = require('axios')
 const _ = require('lodash')
 
 module.exports = {
+  regex: {
+    TOKENIDHEX: '[0-9a-f]{64}',
+    TXID: '[0-9a-f]{64}',
+    UTXO: '[0-9a-f]{64}:[0-9]+'
+  },
   query: (query) => new Promise((resolve, reject) => {
     if (!query) {
       return reject(new Error('no query provided'))
