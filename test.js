@@ -229,7 +229,16 @@ describe('confirmed', () => {
         .then((data) => assert.strict.equal(0, data.c.length))
     )
   }))
-
+  describe('tx', () => {
+    describe('tx.h', () => {
+      describe('#h correct format', () =>
+        it('tx.h must exist and must be hex string of 64 length', () =>
+          slpdb.query(slpdb.inverse_match_regex('tx.h', 't', regex.TXID))
+            .then((data) => assert.strict.equal(0, data.t.length))
+        )
+      )
+    })
+  })
   describe('confirmed.slp', () => {
     describe('confirmed.slp.details', () => {
       describe('#tokenIdHex correct format', () => {
