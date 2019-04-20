@@ -9,7 +9,7 @@ const btoa = require('btoa')
 const axios = require('axios')
 const _ = require('lodash')
 
-module.exports = {
+const slpdb = {
   regex: {
     TOKENIDHEX: '[0-9a-f]{64}',
     TXID: '[0-9a-f]{64}',
@@ -50,13 +50,15 @@ module.exports = {
     }
   },
 
+  inverse_regex: (regex) => `^((?!${regex}).)*$`,
+
   inverse_match_regex: (prop, db, regex) => ({
     'v': 3,
     'q': {
       'db': [db],
       'find': {
         [prop]: {
-          '$regex': `^((?!${regex}).)*$`
+          '$regex': slpdb.inverse_regex(regex)
         }
       },
       'limit': 1
@@ -74,5 +76,41 @@ module.exports = {
       },
       'limit': 1
     }
+  }),
+
+  inverse_match_list: (prop, db, list, count = prop) => {
+    let aggConditions = list.map(v => ({
+      '$match': {
+        [prop]: v
+      }
+    })).concat({
+      '$count': count
+    })
+
+    return {
+      'v': 3,
+      'q': {
+        'db': [db],
+        'aggregate': aggConditions,
+        'limit': 1
+      }
+    }
+  },
+
+  inverse_match_not_type: (prop, db, ntype) => ({
+    'v': 3,
+    'q': {
+      'db': db,
+      'find': {
+        [prop]: {
+          '$not': {
+            '$type': ntype
+          }
+        }
+      },
+      'limit': 1
+    }
   })
 }
+
+module.exports = slpdb

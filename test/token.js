@@ -41,32 +41,11 @@ describe('tokens', () => {
 
   describe('#mintBatonUtxo correct format', () => {
     it('mintBatonUtxo must be either empty string or follow the regex provided for txid:vout', () =>
-      slpdb.query({
-        'v': 3,
-        'q': {
-          'db': ['t'],
-          'aggregate': [
-            {
-              '$match': {
-                'mintBatonUtxo': {
-                  '$ne': ''
-                }
-              }
-            },
-            {
-              '$match': {
-                'mintBatonUtxo': {
-                  '$regex': `^((?![0-9a-f]{64}:[0-9]+).)*$`
-                }
-              }
-            },
-            {
-              '$count': 'mintBatonUtxo'
-            }
-          ],
-          'limit': 1
-        }
-      }).then((data) => assert.strict.equal(0, data.t.length))
+      slpdb.query(slpdb.inverse_match_list('mintBatonUtxo', 't', [
+        { '$ne': '' },
+        { '$regex': slpdb.inverse_regex('[0-9a-f]{64}:[0-9]+') }
+      ]))
+        .then((data) => assert.strict.equal(0, data.t.length))
     )
   })
 
@@ -92,6 +71,79 @@ describe('tokens', () => {
     describe('#tokenDetails.versionType correct format', () => {
       it('versionType must be 1', () =>
         slpdb.query(slpdb.inverse_match_array('tokenDetails.versionType', 't', [1]))
+          .then((data) => assert.strict.equal(0, data.t.length))
+      )
+    })
+    describe('#tokenDetails.batonVout correct format', () => {
+      it('batonVout must be a positive number', () =>
+        slpdb.query({
+          'v': 3,
+          'q': {
+            'db': 't',
+            'find': {
+              'tokenDetails.batonVout': {
+                '$lt': 0
+              }
+            },
+            'limit': 1
+          }
+        })
+          .then((data) => assert.strict.equal(0, data.t.length))
+      )
+    })
+    describe('#documentUri is string', () => {
+      it('documentUri must be a string', () =>
+        slpdb.query(slpdb.inverse_match_not_type('tokenDetails.documentUri', 't', 'string'))
+          .then((data) => assert.strict.equal(0, data.t.length))
+      )
+    })
+    describe('#symbol is string', () => {
+      it('symbol must be a string', () =>
+        slpdb.query(slpdb.inverse_match_not_type('tokenDetails.symbol', 't', 'string'))
+          .then((data) => assert.strict.equal(0, data.t.length))
+      )
+    })
+    describe('#name is string', () => {
+      it('name must be a string', () =>
+        slpdb.query(slpdb.inverse_match_not_type('tokenDetails.name', 't', 'string'))
+          .then((data) => assert.strict.equal(0, data.t.length))
+      )
+    })
+    describe('#documentSha256Hex correct format', () => {
+      it('documentSha256Hex must be either empty string or a 32 character long hex', () =>
+        slpdb.query(slpdb.inverse_match_list('tokenDetails.documentSha256Hex', 't', [
+          { '$ne': '' },
+          { '$regex': slpdb.inverse_regex('[0-9a-f]{32}') }
+        ], 'mintBatonUtxo')) // we use mintBatonUtxo because count cannot deal with dot separation
+          .then((data) => assert.strict.equal(0, data.t.length))
+      )
+    })
+    describe('#tokenDetails.containsBaton correct format', () => {
+      it('versionType must be 1', () =>
+        slpdb.query(slpdb.inverse_match_array('tokenDetails.containsBaton', 't', [false, true]))
+          .then((data) => assert.strict.equal(0, data.t.length))
+      )
+    })
+    describe('#tokenDetails.genesisOrMintQuantity correct format', () => {
+      it('genesisOrMintQuantity must be a positive number', () =>
+        slpdb.query({
+          'v': 3,
+          'q': {
+            'db': 't',
+            'find': {
+              'tokenDetails.batonVout': {
+                '$lt': 0
+              }
+            },
+            'limit': 1
+          }
+        })
+          .then((data) => assert.strict.equal(0, data.t.length))
+      )
+    })
+    describe('#tokenDetails.containsBaton correct format', () => {
+      it('versionType must be 1', () =>
+        slpdb.query(slpdb.inverse_match_array('tokenDetails.sendOutputs', 't', [null]))
           .then((data) => assert.strict.equal(0, data.t.length))
       )
     })
