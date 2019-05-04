@@ -7,8 +7,6 @@ describe('graphs', () => {
     'tokenDetails.tokenIdHex',
     'graphTxn',
     'graphTxn.txid',
-    'graphTxn.timestamp',
-    'graphTxn.block',
     'graphTxn.details',
     'graphTxn.details.decimals',
     'graphTxn.details.tokenIdHex',
