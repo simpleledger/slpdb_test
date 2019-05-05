@@ -5,7 +5,10 @@ describe('utxos', () => {
   [
     'tokenDetails',
     'tokenDetails.tokenIdHex',
-    'utxo'
+    'utxo',
+    'address', 
+    'bchSatoshis', 
+    'slpAmount'
   ].forEach(key => describe(`#${key} exists`, () => {
     it(`there should be no utxo documents without a ${key} property`, () =>
       slpdb.query(slpdb.exists(key, 'x'))
