@@ -6,6 +6,8 @@ describe('utxos', () => {
     'tokenDetails',
     'tokenDetails.tokenIdHex',
     'utxo',
+    'txid',
+    'vout',
     'address', 
     'bchSatoshis', 
     'slpAmount'
