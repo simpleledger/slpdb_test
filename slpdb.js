@@ -31,6 +31,17 @@ const slpdb = {
     )
   }),
 
+  match: (prop, db, match) => ({
+    'v': 3,
+    'q': {
+      'db': db,
+      'find': {
+        [prop]: match
+        },
+        'limit': 1
+    }
+  }),
+
   // helper query to check the property exists
   exists: (prop, db, additional_requirements = {}) => {
     let find = {

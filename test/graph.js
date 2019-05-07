@@ -28,7 +28,13 @@ describe('graphs', () => {
     'graphTxn.outputs.bchSatoshis',
     'graphTxn.outputs.spendTxid',
     'graphTxn.outputs.status',
-    'graphTxn.outputs.invalidReason'
+    'graphTxn.outputs.invalidReason',
+    'graphTxn.inputs',
+    // 'graphTxn.inputs.txid',         <-- NOTE: These 5 props may be not present when "graph.inputs" == []
+    // 'graphTxn.inputs.vout',         <--
+    // 'graphTxn.inputs.address',      <--
+    // 'graphTxn.inputs.bchSatoshis',  <--
+    // 'graphTxn.inputs.slpAmount',    <--
   ].forEach(key => describe(`#${key} exists`, () => {
     it(`there should be no graph documents without a ${key} property`, () =>
       slpdb.query(slpdb.exists(key, 'g'))
@@ -46,6 +52,14 @@ describe('graphs', () => {
       describe('#tokenIdHex correct format', () =>
         it('tokenIdHex must exist and must be hex string of 64 length', () =>
           slpdb.query(slpdb.inverse_match_regex('graphTxn.details.tokenIdHex', 'g', slpdb.regex.TOKENIDHEX))
+            .then((data) => assert.strict.equal(0, data.g.length))
+        )
+      )
+    })
+    describe('graphs.outputs.invalidReason', () => {
+      describe('#invalidReason correct format', () => 
+        it('invalidReason must not be an empty string', () => 
+          slpdb.query(slpdb.match('graphTxn.outputs.invalidReason', 'g', ""))
             .then((data) => assert.strict.equal(0, data.g.length))
         )
       )
