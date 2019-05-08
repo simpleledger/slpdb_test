@@ -31,6 +31,39 @@ describe('confirmed', () => {
     )
   }));
 
+
+  [
+    'tx',
+    'tx.h',
+    'in',
+    'in.i',
+    'in.str',
+    'in.e',
+    'in.e.h',
+    'in.e.i',
+    'in.e.a',
+    'out',
+    'out.i',
+    'out.str',
+    'out.e',
+    'out.e.v',
+    'out.e.i',
+    'slp',
+    'slp.valid',
+    'blk',
+    'blk.h',
+    'blk.i',
+    'blk.t'
+  ].forEach(key => describe(`#${key} exists and not null`, () => {
+    it(`there should be no confirmed documents with a null ${key} property`, () =>
+      slpdb.query(slpdb.match(key, 'c', {
+        '$exists': true,
+        '$eq': null
+      }))
+      .then((data) => assert.strict.equal(0, data.c.length))
+    )
+  }));
+
   [
     'slp.detail',
     'slp.detail.decimals',
