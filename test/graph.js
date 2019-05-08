@@ -40,7 +40,41 @@ describe('graphs', () => {
       slpdb.query(slpdb.exists(key, 'g'))
         .then((data) => assert.strict.equal(0, data.g.length))
     )
-  }))
+  }));
+
+
+  [
+    'tokenDetails',
+    'tokenDetails.tokenIdHex',
+    'graphTxn',
+    'graphTxn.txid',
+    'graphTxn.details',
+    'graphTxn.details.tokenIdHex',
+    'graphTxn.details.transactionType',
+    'graphTxn.details.versionType',
+    'graphTxn.details.containsBaton',
+    'graphTxn.outputs',
+    'graphTxn.outputs.slpAmount',
+    'graphTxn.outputs.address',
+    'graphTxn.outputs.vout',
+    'graphTxn.outputs.bchSatoshis',
+    'graphTxn.outputs.status',
+    'graphTxn.inputs',
+    'graphTxn.inputs.txid',
+    'graphTxn.inputs.vout',
+    'graphTxn.inputs.address',
+    'graphTxn.inputs.bchSatoshis',
+    'graphTxn.inputs.slpAmount',
+  ].forEach(key => describe(`#${key} exists and not null`, () => {
+    it(`there should be no graph documents with a null ${key} property`, () =>
+      slpdb.query(slpdb.match(key, 'g', {
+        '$exists': true,
+        '$eq': null
+      }))
+      .then((data) => assert.strict.equal(0, data.g.length))
+    )
+  }));
+
   describe('graphs.graphTxn', () => {
     describe('#txid correct format', () =>
       it('txid must exist and must be hex string of 64 length', () =>
