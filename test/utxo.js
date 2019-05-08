@@ -16,7 +16,27 @@ describe('utxos', () => {
       slpdb.query(slpdb.exists(key, 'x'))
         .then((data) => assert.strict.equal(0, data.x.length))
     )
-  }))
+  }));
+
+  [
+    'tokenDetails',
+    'tokenDetails.tokenIdHex',
+    'utxo',
+    'txid',
+    'vout',
+    'address', 
+    'bchSatoshis', 
+    'slpAmount'
+  ].forEach(key => describe(`#${key} exists and not null`, () => {
+    it(`there should be no utxo documents with a null ${key} property`, () =>
+      slpdb.query(slpdb.match(key, 'x', {
+        '$exists': true,
+        '$eq': null
+      }))
+      .then((data) => assert.strict.equal(0, data.x.length))
+    )
+  }));
+
   describe('utxos.tokenDetails', () => {
     describe('#tokenIdHex correct format', () =>
       it('tokenIdHex must exist and must be hex string of 64 length', () =>

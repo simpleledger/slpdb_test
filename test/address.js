@@ -13,7 +13,24 @@ describe('addresses', () => {
       slpdb.query(slpdb.exists(key, 'a'))
         .then((data) => assert.strict.equal(0, data.a.length))
     )
-  }))
+  }));
+
+  [
+    'tokenDetails',
+    'tokenDetails.tokenIdHex',
+    'address',
+    'satoshis_balance',
+    'token_balance'
+  ].forEach(key => describe(`#${key} exists and not null`, () => {
+    it(`there should be no address documents with a null ${key} property`, () =>
+      slpdb.query(slpdb.match(key, 'a', {
+        '$exists': true,
+        '$eq': null
+      }))
+      .then((data) => assert.strict.equal(0, data.a.length))
+    )
+  }));
+
   describe('addresses.tokenDetails', () => {
     describe('#tokenIdHex correct format', () =>
       it('tokenIdHex must exist and must be hex string of 64 length', () =>

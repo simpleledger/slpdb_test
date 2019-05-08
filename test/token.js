@@ -37,7 +37,43 @@ describe('tokens', () => {
       slpdb.query(slpdb.exists(key, 't'))
         .then((data) => assert.strict.equal(0, data.t.length))
     )
-  }))
+  }));
+
+  [
+    'schema_version',
+    'lastUpdatedBlock',
+    'mintBatonUtxo',
+    'tokenDetails',
+    'tokenDetails.decimals',
+    'tokenDetails.tokenIdHex',
+    'tokenDetails.timestamp',
+    'tokenDetails.transactionType',
+    'tokenDetails.versionType',
+    'tokenDetails.documentUri',
+    'tokenDetails.documentSha256Hex',
+    'tokenDetails.symbol',
+    'tokenDetails.name',
+    'tokenDetails.containsBaton',
+    'tokenDetails.genesisOrMintQuantity',
+    'tokenStats',
+    'tokenStats.block_created',
+    'tokenStats.qty_valid_txns_since_genesis',
+    'tokenStats.qty_valid_token_utxos',
+    'tokenStats.qty_valid_token_addresses',
+    'tokenStats.qty_token_minted',
+    'tokenStats.qty_token_burned',
+    'tokenStats.qty_token_circulating_supply',
+    'tokenStats.qty_satoshis_locked_up',
+    'tokenStats.minting_baton_status'
+  ].forEach(key => describe(`#${key} exists and not null`, () => {
+    it(`there should be no token documents with a null ${key} property`, () =>
+      slpdb.query(slpdb.match(key, 't', {
+        '$exists': true,
+        '$eq': null
+      }))
+      .then((data) => assert.strict.equal(0, data.t.length))
+    )
+  }));
 
   describe('#mintBatonUtxo correct format', () => {
     it('mintBatonUtxo must be either empty string or follow the regex provided for txid:vout', () =>
