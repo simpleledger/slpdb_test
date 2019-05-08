@@ -31,16 +31,22 @@ const slpdb = {
     )
   }),
 
-  match: (prop, db, match) => ({
-    'v': 3,
-    'q': {
-      'db': db,
-      'find': {
-        [prop]: match
-        },
+  match: (prop, db, match, additional_requirements = {}) => {
+    let find = {
+      [prop]: match
+    };
+
+    _.merge(find, additional_requirements);
+
+    return {
+      'v': 3,
+      'q': {
+        'db': db,
+        'find': find,
         'limit': 1
-    }
-  }),
+      }
+    };
+  },
 
   // helper query to check the property exists
   exists: (prop, db, additional_requirements = {}) => {
