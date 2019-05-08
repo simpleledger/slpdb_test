@@ -53,7 +53,35 @@ describe('confirmed', () => {
       slpdb.query(slpdb.exists(key, 'c', { 'slp.valid': true }))
         .then((data) => assert.strict.equal(0, data.c.length))
     )
+  }));
+
+  [
+    'slp.detail',
+    'slp.detail.decimals',
+    'slp.detail.tokenIdHex',
+    'slp.detail.transactionType',
+    'slp.detail.versionType',
+    'slp.detail.documentUri',
+    'slp.detail.documentSha256Hex',
+    'slp.detail.symbol',
+    'slp.detail.name',
+    'slp.detail.txnContainsBaton',
+    'slp.detail.outputs',
+    'slp.detail.outputs.address',
+    'slp.detail.outputs.amount',
+    'slp.schema_version'
+  ].forEach(key => describe(`#${key} exists and not null`, () => {
+    it(`there should be no confirmed documents with a null ${key} property`, () =>
+      slpdb.query(slpdb.match(key, 'c', {
+        '$exists': true,
+        '$eq': null
+      }, {
+        'slp.valid': true
+      }))
+      .then((data) => assert.strict.equal(0, data.c.length))
+    )
   }))
+
   describe('tx', () => {
     describe('tx.h', () => {
       describe('#h correct format', () =>
